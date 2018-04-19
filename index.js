@@ -6,7 +6,10 @@ const { createServer } = require("http");
 const { SubscriptionServer } = require("subscriptions-transport-ws");
 const { execute, subscribe } = require("graphql");
 const { PubSub } = require("graphql-subscriptions");
+
+// Initalise one pubsub instance which all data is published on
 const pubsub = new PubSub();
+
 // Some fake data
 let feedbacks = [
   {
@@ -28,6 +31,7 @@ let books = [
     author: "Terry Pratchett"
   }
 ];
+
 // The GraphQL schema in string form
 const typeDefs = `
 type Feedback { id: Int!, text: String! }
@@ -55,11 +59,10 @@ schema {
 }
 `;
 
-// The resolvers
 const resolvers = {
   Query: {
     books: () => books,
-    feedbacks: () => feedbacks,
+    feedbacks: () => feedbacks
   },
   Mutation: {
     addFeedback(_, args) {
@@ -117,12 +120,9 @@ app.use(
 
 const server = createServer(app);
 server.listen(3000, () => {
-  console.log(`server now listening at :3000`);
+  console.log(`server now listening at http://localhost:3000`);
   new SubscriptionServer(
     {
-      onConnect: connectionParams =>
-        console.log("client subscription connected!", connectionParams),
-      onDisconnect: () => console.log("client subscription disconnected!"),
       execute,
       subscribe,
       schema
