@@ -110,15 +110,15 @@ app.use(
   })
 );
 
+const port = 3001
 // GraphiQL, a visual editor for queries
 app.use(
   "/graphiql",
   graphiqlExpress({
     endpointURL: "/graphql",
-    subscriptionsEndpoint: `ws://localhost:3000/subscriptions`
+    subscriptionsEndpoint: `ws://localhost:${port}/subscriptions`
   })
 );
-const port = 4000
 const server = createServer(app);
 server.listen(port, () => {
   console.log(`graphiql client at http://localhost:${port}/graphiql`);
