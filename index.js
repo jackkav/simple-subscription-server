@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require('cors');
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const { graphqlExpress, graphiqlExpress } = require("apollo-server-express");
 const { makeExecutableSchema } = require("graphql-tools");
@@ -7,7 +7,7 @@ const { createServer } = require("http");
 const { SubscriptionServer } = require("subscriptions-transport-ws");
 const { execute, subscribe } = require("graphql");
 const { PubSub } = require("graphql-subscriptions");
-
+const shortid = require("shortid");
 // Initalise one pubsub instance which all data is published on
 const pubsub = new PubSub();
 
@@ -15,19 +15,22 @@ const pubsub = new PubSub();
 let feedbacks = [
   {
     id: 1,
-    text: "text"
+    feedback: "abc"
   }
 ];
 let books = [
   {
+    id: shortid.generate(),
     title: "Hitchhiker's Guide to the Galaxy",
     author: "Douglas Adams"
   },
   {
+    id: shortid.generate(),
     title: "Maps of Meaning",
     author: "Jordan Peterson"
   },
   {
+    id: shortid.generate(),
     title: "The Light Fantastic",
     author: "Terry Pratchett"
   }
@@ -35,10 +38,10 @@ let books = [
 
 // The GraphQL schema in string form
 const typeDefs = `
-type Feedback { id: Int!, text: String! }
-input FeedbackInput { text: String! }
+type Feedback { id: Int!, feedback: String! }
+input FeedbackInput { feedback: String! }
 
-type Book { title: String!, author: String! }
+type Book { id: ID!, title: String!, author: String! }
 input BookInput { title: String!, author: String! }
 
 type Query {
@@ -67,17 +70,13 @@ const resolvers = {
   },
   Mutation: {
     addFeedback(_, args) {
-      let data = args.data;
-      let object = {
-        id: feedbacks.length + 1,
-        text: data.text
-      };
-      feedbacks.unshift(object);
-      pubsub.publish("feedbackAdded", { feedbackAdded: object });
-      return object;
+      args.data.id = feedbacks.length + 1;
+      feedbacks.unshift(args.data);
+      pubsub.publish("feedbackAdded", { feedbackAdded: args.data });
+      return args.data;
     },
     addBook(_, args) {
-      books.unshift(args.data);
+      (args.data.id = shortid.generate()), books.unshift(args.data);
       pubsub.publish("bookAdded", { bookAdded: args.data });
       return args.data;
     }
@@ -100,7 +99,7 @@ const schema = makeExecutableSchema({
 
 // Initialize the app
 const app = express();
-app.use(cors())
+app.use(cors());
 // The GraphQL endpoint
 app.use(
   "/graphql",
@@ -110,7 +109,7 @@ app.use(
   })
 );
 
-const port = 3001
+const port = 3001;
 // GraphiQL, a visual editor for queries
 app.use(
   "/graphiql",
