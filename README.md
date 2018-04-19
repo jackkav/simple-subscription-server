@@ -1,16 +1,16 @@
-### Purpose
+## Purpose
 
 Demonstrate the simplest possible example of an apollo subscription
 
-## To use
+### To use
 
 ```bash
 npm i
 node .
 ```
 
-open [http://localhost:3000/graphiql] in two windows
-in the first paste the following subscription and run it
+open <http://localhost:3000/graphiql> in two windows and arrange them side by side.
+In the first paste the following subscription and run it
 
 ```js
 subscription s{
@@ -23,7 +23,7 @@ subscription s{
 
 You should see "Your subscription data will appear here after server publication!"
 
-In the second window run the following
+In the second window run the following.
 
 ```js
 mutation m {
@@ -32,3 +32,5 @@ mutation m {
   }
 }
 ```
+
+You should see your subscriptions appearing in the first window.
