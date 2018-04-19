@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors');
 const bodyParser = require("body-parser");
 const { graphqlExpress, graphiqlExpress } = require("apollo-server-express");
 const { makeExecutableSchema } = require("graphql-tools");
@@ -99,7 +100,7 @@ const schema = makeExecutableSchema({
 
 // Initialize the app
 const app = express();
-
+app.use(cors())
 // The GraphQL endpoint
 app.use(
   "/graphql",
@@ -117,10 +118,10 @@ app.use(
     subscriptionsEndpoint: `ws://localhost:3000/subscriptions`
   })
 );
-
+const port = 4000
 const server = createServer(app);
-server.listen(3000, () => {
-  console.log(`server now listening at http://localhost:3000`);
+server.listen(port, () => {
+  console.log(`graphiql client at http://localhost:${port}/graphiql`);
   new SubscriptionServer(
     {
       execute,
